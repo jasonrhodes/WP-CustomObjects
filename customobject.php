@@ -20,7 +20,10 @@ Author URI: http://jasonthings.com
 		public $type;
 		public $error_array = array();
 		public $register_options = array();
-	
+		public $metaboxes = 0;
+		public $metabox_options = array();
+
+		
 		# Big thanks to the following:
 		# http://w3prodigy.com/behind-wordpress/php-classes-wordpress-plugin/
 		# Dave Rupert's custom post type boilerplate https://gist.github.com/848232
@@ -61,7 +64,17 @@ Author URI: http://jasonthings.com
 				$this->error_array = array();
 				
 				// Register this object's create_object_type() method to the init action
-				add_action( 'init', array( &$this, 'create_object_type' ) );
+				add_action( 'init', array( $this, 'create_object_type' ) );
+				
+				/*
+					FYI This last action (and others below) was added using an array() with an object/method reference.
+					This makes these classes so much more powerful, because each object instance
+					can register itself, with its object properties, to an action, instead of creating
+					a hundred silly functions in the global scope. No more create_object_type_1 functions necessary!
+					
+					For more info: https://twitter.com/#!/markjaquith/status/76038034440728576				
+					Also, it's not necessary to use &$this, just $this works as of PHP 5. https://twitter.com/#!/mattwiebe/status/76040791725838336
+				*/
 				
 			}
 		
@@ -170,7 +183,7 @@ Author URI: http://jasonthings.com
 		 *
 		 * To do that, call these methods after you've initialized your new object type, like:
 		 * 		
-		 *		$event = new CustomObject( $options ); 
+		 *		$event = new CustomObject( $type, $options, $labels ); 
 		 * 		$event->setup_meta_box( $meta_box_options );
 		 *
 		 * Or something like that.
@@ -179,10 +192,85 @@ Author URI: http://jasonthings.com
 	
 		
 		public function setup_meta_box( $options ) {
-		
-			//add_meta_box
-		
+			
+			$mb = new MetaBox( $options, $this->type );	
+
 		} // end setup_meta_box()
-	
+		
+
 	
 	} // end CustomObject class
+	
+	
+	class MetaBox {
+	
+		public $options;
+		private $nonce_name;
+		
+		function __construct( $options, $type ) {
+			
+			if ( !$options ) return false;
+			
+			// Save the $options to the class so functions can use it later
+			$this->options = $options;
+			foreach ( $this->options as $k => $v ) {
+				$this->$k = $v;
+			}
+			
+			if ( !isset( $this->type ) ) $this->type = $type;
+			
+			
+			// Register this meta box to a WP action
+			if ( has_action( 'add_meta_boxes' ) ) {
+				// WP 3.0+
+				add_action( 'add_meta_boxes', array( $this, 'wpco_add_meta_box' ) );
+			}
+			else {
+				// backwards compatible?
+				add_action( 'admin_init', array( $this, 'wpco_add_meta_box' ), 1 );
+			}
+			
+			// Make sure you save any data
+			add_action( 'save_post', array( $this, 'wpco_save_meta_box' ) );
+			
+		} // end __construct() method
+		
+		function wpco_add_meta_box() {
+		
+			add_meta_box( $this->id, $this->title, array( $this, 'wpco_metabox_content' ), $this->type, $this->context, $this->priority );
+		
+		} // end wpco_add_meta_box() method
+		
+		function wpco_save_meta_box( $id ) {
+		
+			// Verify if this is an auto save routine. 
+		  // If it is, our form has not been submitted, so we don't want to do anything
+		  if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) 
+		      return;
+		
+		  // Verify this came from the our screen and with proper authorization,
+		  // because save_post can be triggered at other times
+		  if ( !wp_verify_nonce( $_POST[$this->nonce_name], $this->nonce_action ) )
+		      return;
+		
+		  // TODO: use the array of fields from the wpco_metabox_content TODO item, and save each one individually
+		  
+		
+		} // end wpco_save_meta_box() method
+		
+		
+		function wpco_metabox_content() {
+			
+			// Generate a semi-secure nonce name and action
+			$this->nonce_name = 'nonce_name_' . time();
+			$this->nonce_action = 'save_metabox_data_' . time();
+			wp_nonce_field( $this->nonce_action, $this->nonce_name );
+			
+			echo isset( $this->html ) ? $this->html : '';
+			
+			// TODO: Swap out this 'html' var for an array of fields, and build the HTML here.
+		
+		} // end wpco_metabox_content() method
+	
+	} // end MetaBox class
+	
