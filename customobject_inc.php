@@ -1,24 +1,4 @@
-<?php
-/**
- * @package WP Custom Object
- * @version 1.0
- */
-/*
-Plugin Name: WP Custom Object
-Plugin URI: http://jasonthings.com/wordpress/wp-custom-object
-Description: Creates a WP Custom Object class to quickly get a custom object up and running (otherwise known as "custom post type")
-Author: Jason Rhodes
-Version: 1.0
-Author URI: http://jasonthings.com
-*/
-
-	define('WPCUSTOMOBJECT_VERSION', '1.0.0');
-	define('WPCUSTOMOBJECT_PLUGIN_URL', plugin_dir_url( __FILE__ ));
-
-	function roundtable_init() {
-		// Do nothing for now...
-	}
-	
+<?php	
 	class CustomObject {
 		
 		public $type;
