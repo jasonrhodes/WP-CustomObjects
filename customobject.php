@@ -6,7 +6,7 @@
 /*
 Plugin Name: WP Custom Object
 Plugin URI: http://jasonthings.com/wordpress/wp-custom-object
-Description: Creates a WP Custom Object class to quickly get a custom object up and running (otherwise known as "custom post type")
+Description: Registers the custom object class so you can easily build custom objects from your functions.php file.
 Author: Jason Rhodes
 Version: 1.0
 Author URI: http://jasonthings.com
@@ -14,23 +14,17 @@ Author URI: http://jasonthings.com
 
 	define('WPCUSTOMOBJECT_VERSION', '1.0.0');
 	define('WPCUSTOMOBJECT_PLUGIN_URL', plugin_dir_url( __FILE__ ));
-
-	function roundtable_init() {
-		// Do nothing for now...
-	}
 	
 	class CustomObject {
 		
 		public $type;
-		
 		public $error_array = array();
 		public $register_options = array();
-		public $meta_box_options = array();
-		public $meta_fields_array = array();
-		public $columns_array = array();
 	
-		# credit: http://w3prodigy.com/behind-wordpress/php-classes-wordpress-plugin/
-		# credit: Dave Rupert's custom post type boilerplate https://gist.github.com/848232
+		# Big thanks to the following:
+		# http://w3prodigy.com/behind-wordpress/php-classes-wordpress-plugin/
+		# Dave Rupert's custom post type boilerplate https://gist.github.com/848232
+		
 		# Old versions of PHP will now call the __construct method
 		function CustomObject( $type, $options, $labels ) {
 			$this->__construct( $type, $options, $labels );
@@ -46,12 +40,16 @@ Author URI: http://jasonthings.com
 			
 			if ( !!$options ) { 	
 				$this->register_options = $options;
+				// Setting up local class variables for convenience
+				// TODO: Is this way too expensive for performance? We could easily swap it out.
 				foreach ( $options as $key => $value ) {
 					$this->$key = $value; 
 				}
 			}
 			
-			if ( !!$labels ) {		
+			if ( !!$labels ) {	
+				// Setting up local class variables for convenience
+				// TODO: Is this way too expensive for performance? We could easily swap it out.	
 				foreach ( $labels as $key => $value ) {
 					$this->$key = $value;
 				}		
@@ -59,7 +57,10 @@ Author URI: http://jasonthings.com
 			
 			if ( $this->validate() ) {
 				
-				$this->error_array = array(); // empty the error array
+				// Empty the error array
+				$this->error_array = array();
+				
+				// Register this object's create_object_type() method to the init action
 				add_action( 'init', array( &$this, 'create_object_type' ) );
 				
 			}
@@ -95,6 +96,9 @@ Author URI: http://jasonthings.com
 		
 		
 		public function setup_labels() {
+		
+			// I've found that I usually just want these labels to be what you'd expect
+			// So I leave $labels an empty array and let this method do its magic.
 			
 			if ( !$this->add_new ) {
 				$this->add_new = "Add New " . $this->singular_name;
