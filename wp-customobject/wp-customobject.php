@@ -285,8 +285,33 @@ Author URI: http://jasonthings.com
 			$this->nonce_action = 'save_metabox_data_' . time();
 			wp_nonce_field( $this->nonce_action, $this->nonce_name );
 			
-			echo isset( $this->html ) ? $this->html : 'No content for this metabox.';
+			// echo isset( $this->html ) ? $this->html : 'No content for this metabox.';
 			
+			if ( !$this->fields || !is_array( $this->fields ) ) { 
+				echo "No content for this meta box.";
+				return;
+			}
+			
+			foreach ( $this->fields as $field ) {
+				$name = !!$field['name'] ? $field['name'] : false;
+				$label = !!$field['label'] ? $field['label'] : false;
+				$type = !!$field['type'] ? $field['type'] : false;
+				$value = !!$field['value'] ? $field['value'] : false;
+				
+				switch ( $type ) {
+					
+					case false:
+						break;
+					case "text":
+						echo "<label for='{$name}'>{$label}</label>";
+						echo "<input type='text' name='{$name}' id='{$name}'";
+						if ( $value ) echo " value='{$value}'";
+						echo " />";
+						break;
+					
+				}
+				
+			}
 			// TODO: Swap out this 'html' var for an array of fields, and build the HTML here.
 		
 		} // end wpco_metabox_content() method
