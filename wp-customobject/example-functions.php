@@ -5,7 +5,10 @@
  * or into a separate plugin file you create for yourself.
  *
  ********************************************************/
- 
+
+/* Check if our plugin is on. If it is, the custom object class will exist. */
+if ( class_exists( 'CustomObject' ) ) :
+
 /* 'Type' is the name for your new custom object.
  * It can be written as 'client groups' or 'client_groups', and
  * all the default labels and names will be set correctly.
@@ -98,5 +101,8 @@ $mb_options = array(
  * and you will have a working metabox running. 
  */
 $client_groups->setup_metabox( $mb_options );
+
+/* Close that if statement when we checked if the class exists! */
+endif; 
 
 /* That's it for now! */

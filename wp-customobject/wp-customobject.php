@@ -34,9 +34,7 @@ Author URI: http://jasonthings.com
 		}
 		
 		public function __construct( $type, $options = array(), $labels = array() ) {
-			
-			logme( 'The custom object class is fired' );
-			
+						
 			// Pass in all of your options in the options array, labels in the labels array -- duh
 			// 
 			// For a complete list of available options, see: http://codex.wordpress.org/Function_Reference/register_post_type#Arguments
