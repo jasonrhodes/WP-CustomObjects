@@ -13,21 +13,7 @@ Author URI: http://jasonthings.com
 */
 
 	define('WPCUSTOMOBJECTS_VERSION', '1.1.0');
-	define('WPCUSTOMOBJECTS_PLUGIN_URL', plugin_dir_url( __FILE__ ));
-	
-	function logme( $message ) {
-		$filename = "log-" . date('Ymd') . ".txt";
-		$file = fopen( $filename, 'a' );
-		//$trace = debug_backtrace();
-		//fwrite( $file, date('h:i:s') . '\t' . $message . '\r\n' . $trace['function'] . " (" . $trace['line'] . ")" . '\r\n\r\n' );
-		//fclose( $file );
-	}
-	
-	function test_log() {
-		logme( 'test' );
-	}
-	add_action( 'init', 'test_log' );
-	
+	define('WPCUSTOMOBJECTS_PLUGIN_URL', plugin_dir_url( __FILE__ ));	
 	
 	class CustomObject {
 		
