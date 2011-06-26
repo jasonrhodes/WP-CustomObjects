@@ -102,6 +102,15 @@ $mb_options = array(
  */
 $client_groups->setup_metabox( $mb_options );
 
+/* If you would like to disable adding new objects for this object type,
+ * you can use this function to take care of the multiple actions
+ * needed to achieve this. 
+ * Based on: http://minimalbugs.com/questions/how-to-disable-add-new-post-in-particular-custom-post-types-wordpress
+ */
+//$client_groups->disable_addnew();
+
+
+/* DON'T ADD ANYMORE WP CUSTOM OBJECTS CALLS AFTER THIS */
 /* Close that if statement when we checked if the class exists! */
 endif; 
 

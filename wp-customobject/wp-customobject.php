@@ -187,12 +187,11 @@ Author URI: http://jasonthings.com
 		 * To do that, call these methods after you've initialized your new object type, like:
 		 * 		
 		 *		$event = new CustomObject( $type, $options, $labels ); 
-		 * 		$event->setup_meta_box( $meta_box_options );
+		 * 		$event->setup_metabox( $metabox_options );
 		 *
 		 * Or something like that.
 		 *
 		 */
-	
 		
 		public function setup_metabox( $options=array() ) {
 			
@@ -202,6 +201,52 @@ Author URI: http://jasonthings.com
 
 		} // end setup_metabox()
 		
+		public function disable_addnew() {
+			
+			/* Use this function to disable the ability to add new objects.
+			 * Once you've created a few, you may want to lock it down so your
+			 * users can't create any additional objects of this kind.
+			 */
+			 
+			 /* http://minimalbugs.com/questions/how-to-disable-add-new-post-in-particular-custom-post-types-wordpress */
+			
+			add_action( 'admin_menu', array( $this, 'disable_addnew_hide_submenu' ) );
+			add_action( 'admin_head', array( $this, 'disable_addnew_hide_button' ) );
+			add_action( 'admin_menu', array( $this, 'disable_addnew_permissions_redirect' ) );
+			add_action( 'admin_init', array( $this, 'disable_addnew_show_notice' ) );
+			
+		}
+				public function disable_addnew_hide_submenu() {
+					global $submenu;
+					unset($submenu['edit.php?post_type='. $this->type][10]);
+				}
+				
+				public function disable_addnew_hide_button() {
+					global $pagenow;
+					if ( is_admin() ) {
+				  	if ( $pagenow == 'edit.php' && $_GET['post_type'] == $this->type ) {
+				      echo "<style type=\"text/css\">.add-new-h2{display: none;}</style>";
+						}  
+					}
+				}
+				
+				public function disable_addnew_permissions_redirect() {
+					$result = stripos( $_SERVER['REQUEST_URI'], 'post-new.php?post_type='. $this->type );
+					if ( $result !== false ) {
+						wp_redirect( get_option('siteurl') . '/wp-admin/index.php?'. $this->type . '_addnew_disabled=true' );
+					}
+				}
+				
+				public function disable_addnew_show_notice() {
+					if ( $_GET[$this->type . '_addnew_disabled'] ) {
+						add_action( 'admin_notices', array( $this, 'disable_addnew_admin_notice' ) );
+					}
+				}
+				
+				public function disable_addnew_admin_notice() {
+					// use the class "error" for red notices, and "update" for yellow notices
+					echo "<div id='permissions-warning' class='error fade'><p><strong>".__('Adding new ' . $this->plural_name . ' is currently disabled.')."</strong></p></div>";
+				}
 
 	
 	} // end CustomObject class
