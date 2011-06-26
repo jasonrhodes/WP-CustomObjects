@@ -385,7 +385,21 @@ Author URI: http://jasonthings.com
 						}
 						echo "</select>";
 						break;
-
+											
+					case 'upload':
+						add_action( 'admin_print_scripts', function () {
+							wp_enqueue_script( 'media-upload' );
+							wp_enqueue_script( 'thickbox' );
+							wp_enqueue_script( 'enable-uploader' );
+						});
+						add_action( 'admin_print_styles', function () {
+							wp_enqueue_style( 'thickbox' );
+						});
+						
+						echo "<div class='upload'><input class='widefat upload-input' type='text' name='{$name}' id='{$name}' value='{$value}' />";
+						echo "<input type='submit' class='upload-button' value='Choose File' />";
+						echo "</div>";
+						break;
 						
 					default:
 						echo "<label for='{$name}' style='display: block; margin-bottom: 5px;'>{$label}</label>";
@@ -405,3 +419,7 @@ Author URI: http://jasonthings.com
 		
 	}
 	
+	function wpco_register_scripts() {
+		wp_register_script( 'enable-uploader', WPCUSTOMOBJECTS_PLUGIN_URL . '/enable-uploader.js', array( 'jquery' ) );
+	}
+	add_action( 'init', 'wpco_register_scripts' );
