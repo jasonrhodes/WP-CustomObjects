@@ -385,6 +385,7 @@ Author URI: http://jasonthings.com
 						}
 						echo "</select>";
 						break;
+
 						
 					default:
 						echo "<label for='{$name}' style='display: block; margin-bottom: 5px;'>{$label}</label>";
