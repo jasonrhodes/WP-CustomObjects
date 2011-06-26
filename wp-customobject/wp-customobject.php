@@ -1,19 +1,33 @@
 <?php
 /**
- * @package WP Custom Object
- * @version 1.0
+ * @package WP Custom Objects
+ * @version 1.1
  */
 /*
-Plugin Name: WP Custom Object
-Plugin URI: http://jasonthings.com/wordpress/wp-custom-object
+Plugin Name: WP Custom Objects
+Plugin URI: http://jasonthings.com/wordpress/wp-custom-objects
 Description: Registers the custom object class so you can easily build custom objects from your functions.php file.
 Author: Jason Rhodes
-Version: 1.0
+Version: 1.1
 Author URI: http://jasonthings.com
 */
 
-	define('WPCUSTOMOBJECT_VERSION', '1.0.0');
-	define('WPCUSTOMOBJECT_PLUGIN_URL', plugin_dir_url( __FILE__ ));
+	define('WPCUSTOMOBJECTS_VERSION', '1.1.0');
+	define('WPCUSTOMOBJECTS_PLUGIN_URL', plugin_dir_url( __FILE__ ));
+	
+	function logme( $message ) {
+		$filename = "log-" . date('Ymd') . ".txt";
+		$file = fopen( $filename, 'a' );
+		//$trace = debug_backtrace();
+		//fwrite( $file, date('h:i:s') . '\t' . $message . '\r\n' . $trace['function'] . " (" . $trace['line'] . ")" . '\r\n\r\n' );
+		//fclose( $file );
+	}
+	
+	function test_log() {
+		logme( 'test' );
+	}
+	add_action( 'init', 'test_log' );
+	
 	
 	class CustomObject {
 		
@@ -34,6 +48,8 @@ Author URI: http://jasonthings.com
 		}
 		
 		public function __construct( $type, $options = array(), $labels = array() ) {
+			
+			logme( 'The custom object class is fired' );
 			
 			// Pass in all of your options in the options array, labels in the labels array -- duh
 			// 
@@ -64,7 +80,7 @@ Author URI: http://jasonthings.com
 				$this->error_array = array();
 				
 				// Register this object's create_object_type() method to the init action
-				add_action( 'init', array( $this, 'create_object_type' ) );
+				add_action( 'init', array( &$this, 'create_object_type' ) );
 				
 				/*
 					FYI This last action (and others below) was added using an array() with an object/method reference.
@@ -92,12 +108,15 @@ Author URI: http://jasonthings.com
 				return false;
 			}
 			else {
+				$this->type = str_replace( " ", "_", $this->type );
+				if ( substr( $this->type, -1) == "s" ) { $this->type = substr( $this->type, 0, -1); }
 				$this->type = strtolower( $this->type );
 			}
 			
 			// A couple other required setups once $this->type has been set
 			if ( !$this->singular_name && !!$this->type ) {
-				$this->singular_name = ucwords( $this->type );
+				$spaced_type = str_replace( "_", " ", $this->type );
+				$this->singular_name = ucwords( $spaced_type );
 			}
 			if ( !$this->plural_name && !!$this->singular_name ) {
 				$this->plural_name = $this->singular_name . "s";
@@ -191,25 +210,27 @@ Author URI: http://jasonthings.com
 		 */
 	
 		
-		public function setup_meta_box( $options ) {
+		public function setup_metabox( $options=array() ) {
 			
-			$mb = new MetaBox( $options, $this->type );	
+			if ( !is_array( $options ) ) $options = array( $options );
+			$mb = new MetaBox( $options, $this->type );
+			return $mb;
 
-		} // end setup_meta_box()
+		} // end setup_metabox()
 		
 
 	
 	} // end CustomObject class
 	
-	
 	class MetaBox {
-	
-		public $options;
-		private $nonce_name;
 		
-		function __construct( $options, $type ) {
+		public $options;
+		public $type;
+		private static $nonce_name = 'wp-custom-object-nonce';
+		
+		function __construct( $options = array(), $type ) {
 			
-			if ( !$options ) return false;
+			if ( !is_array( $options ) ) $options = array( $options );
 			
 			// Save the $options to the class so functions can use it later
 			$this->options = $options;
@@ -235,7 +256,7 @@ Author URI: http://jasonthings.com
 			// Make sure you save any data
 			add_action( 'save_post', array( $this, 'wpco_save_meta_box' ) );
 			
-		} // end __construct() method
+		}
 		
 		function setup_options() {
 		
@@ -247,9 +268,12 @@ Author URI: http://jasonthings.com
 				'high', 'core', 'default', 'low'
 			);
 			
-			$this->id = isset( $this->id && !empty( $this->id ) ) ? $this->id : "metabox-" . time();
-			$this->title = isset( $this->title && !empty( $this->title ) ) ? $this->title : ucwords( $this->type ) . " Meta Box";
+			$this->id = isset( $this->id ) && !empty( $this->id ) ? $this->id : "metabox-" . time();
+			
+			$this->title = isset( $this->title ) && !empty( $this->title ) ? $this->title : ucwords( $this->type ) . " Meta Box";
+			
 			$this->context = isset( $this->context ) && in_array( $this->context, $allowed_context ) ? $this->context : 'advanced';
+			
 			$this->priority = isset( $this->priority ) && in_array( $this->priority, $allowed_priority ) ? $this->priority : 'default';
 		
 		}
@@ -269,23 +293,45 @@ Author URI: http://jasonthings.com
 		
 		  // Verify this came from the our screen and with proper authorization,
 		  // because save_post can be triggered at other times
-		  if ( !wp_verify_nonce( $_POST[$this->nonce_name], $this->nonce_action ) )
-		      return;
+		  $nonce_name = 'wp_custom_object_nonce';
+		  $nonce_action = 'save_metabox_data';
+		 
+		 // wp_verify_nonce refused to work here, so I done busted it for now...
 		
 		  // TODO: use the array of fields from the wpco_metabox_content TODO item, and save each one individually
 		  
-		
+		  if ( is_array( $this->fields ) ) {
+		  	
+		  	//update_post_meta( $id, '_super_test2', $this->fields );
+		  	
+		  	foreach ( $this->fields as $field ) {
+					$fieldname = $field['name'];
+		  		$varname = "_".$fieldname;
+		  		if ( isset( $_POST[$fieldname] ) ) {
+		  			update_post_meta( $id, $varname, $_POST[$fieldname] );
+		  		}
+		  	}
+		  
+		  }
+		  
 		} // end wpco_save_meta_box() method
 		
 		
 		function wpco_metabox_content() {
 			
-			// Generate a semi-secure nonce name and action
-			$this->nonce_name = 'nonce_name_' . time();
-			$this->nonce_action = 'save_metabox_data_' . time();
-			wp_nonce_field( $this->nonce_action, $this->nonce_name );
+			global $post;
+			$id = get_the_ID();
 			
-			// echo isset( $this->html ) ? $this->html : 'No content for this metabox.';
+			// Generate a semi-secure nonce name and action
+			$nonce_action = 'save_metabox_data';
+			$nonce_name = 'wp_custom_object_nonce';
+			wp_nonce_field( $nonce_action, $nonce_name );
+			
+			if ( !!$this->description ) {
+				echo "<p>" . $this->description . "</p>";
+			}
+			
+			echo "<div style='padding: 10px 0;'>";
 			
 			if ( !$this->fields || !is_array( $this->fields ) ) { 
 				echo "No content for this meta box.";
@@ -293,28 +339,84 @@ Author URI: http://jasonthings.com
 			}
 			
 			foreach ( $this->fields as $field ) {
-				$name = !!$field['name'] ? $field['name'] : false;
-				$label = !!$field['label'] ? $field['label'] : false;
-				$type = !!$field['type'] ? $field['type'] : false;
-				$value = !!$field['value'] ? $field['value'] : false;
+			
+				$name 	= !!$field['name'] 	? $field['name'] 	: false;
+				if ( !$name ) continue;
+				$label 	= !!$field['label'] ? $field['label'] : false;
+				$type 	= !!$field['type'] 	? $field['type'] 	: 'text';
+				$meta_value = get_post_meta( $id, "_" . $name, true );
+				
+				$value = $field['value'];
+				if ( !!$meta_value ) {
+					$value = $meta_value;
+				}
+				elseif ( !!$_POST[$name] ) { 
+					$value = $_POST[$name]; 
+				}
 				
 				switch ( $type ) {
 					
 					case false:
+						echo "Field type not set.";
 						break;
-					case "text":
-						echo "<label for='{$name}'>{$label}</label>";
-						echo "<input type='text' name='{$name}' id='{$name}'";
+					
+					case 'textarea':
+						echo "<label for='{$name}' style='display: block; margin-bottom: 5px;'>{$label}</label>";
+						echo "<textarea class='widefat' name='{$name}' id='{$name}'>{$value}</textarea>";
+						break;
+						
+					case 'checkbox':
+						echo "<p style='margin: 15px 0;'><input";
+						if ( !!$value ) echo " checked";
+						echo " type='checkbox' name='{$name}' id='{$name}' value='{$value}' />";
+						echo "<label for='{$name}' style='margin-left: 8px;'>{$label}</label></p>";
+						break;
+						
+					case 'radio':
+						echo "<div style='margin: 15px 0;'>";
+						echo "<p style='margin-bottom: 5px;'><label for='{$name}'>{$label}</label></p>";
+						$i = 1;
+						foreach ( $field['options'] as $opt ) {
+							$opt_label = $opt[0];
+							$opt_value = !!$opt[1] ? $opt[1] : $opt_label;
+							echo "<p><input";
+							if ( $opt_value == $value ) echo " checked";
+							echo " type='radio' name='{$name}' id='{$name}-{$i}' value='{$opt_value}' />";
+							echo " <label for='{$name}-{$i}'>{$opt_label}</label></p>";
+							$i++;
+						}
+						echo "</div>";
+						break;
+					
+					case 'select':
+						if ( !!$label ) { echo "<label for='{$name}'>{$label}</label>"; }
+						echo "<select class='widefat' style='margin: 15px 0;' name='{$name}' id='{$name}'>";
+						echo "<option value=''>--select one--</option>";
+						foreach ( $field['options'] as $opt ) {
+							$opt_label = $opt[0];
+							$opt_value = !!$opt[1] ? $opt[1] : $opt_label;
+							echo "<option value='{$opt_value}'";
+							if ( $value == $opt_value ) echo " selected";
+							echo ">{$opt_label}</option>";
+						}
+						echo "</select>";
+						break;
+						
+					default:
+						echo "<label for='{$name}' style='display: block; margin-bottom: 5px;'>{$label}</label>";
+						echo "<input class='widefat' style='margin-bottom: 15px;' type='text' name='{$name}' id='{$name}'";
 						if ( $value ) echo " value='{$value}'";
 						echo " />";
 						break;
-					
+						
 				}
 				
 			}
-			// TODO: Swap out this 'html' var for an array of fields, and build the HTML here.
-		
+			
+			echo "</div>";
+					
 		} // end wpco_metabox_content() method
-	
-	} // end MetaBox class
+		
+		
+	}
 	
