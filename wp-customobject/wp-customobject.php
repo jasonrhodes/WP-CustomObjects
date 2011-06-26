@@ -87,7 +87,7 @@ Author URI: http://jasonthings.com
 			
 			// If no type has been set, we can't create this object
 			// Set an error message in error_array and be done with it
-			if ( !$this->type ) {
+			if ( !isset( $this->type ) || empty( $this->type ) ) {
 				$this->error_array[] = "A new custom object needs a <em>type</em>, like 'book', 'restaurant', or 'person'.";
 				return false;
 			}
@@ -98,11 +98,11 @@ Author URI: http://jasonthings.com
 			}
 			
 			// A couple other required setups once $this->type has been set
-			if ( !$this->singular_name && !!$this->type ) {
+			if ( !isset( $this->singular_name ) && !!$this->type ) {
 				$spaced_type = str_replace( "_", " ", $this->type );
 				$this->singular_name = ucwords( $spaced_type );
 			}
-			if ( !$this->plural_name && !!$this->singular_name ) {
+			if ( !isset( $this->plural_name ) && !!$this->singular_name ) {
 				$this->plural_name = $this->singular_name . "s";
 			}
 			
@@ -116,37 +116,37 @@ Author URI: http://jasonthings.com
 			// I've found that I usually just want these labels to be what you'd expect
 			// So I leave $labels an empty array and let this method do its magic.
 			
-			if ( !$this->add_new ) {
+			if ( !isset( $this->add_new ) ) {
 				$this->add_new = "Add New " . $this->singular_name;
 			}
-			if ( !$this->add_new_item ) {
+			if ( !isset( $this->add_new_item ) ) {
 				$this->add_new_item = "Add New " . $this->singular_name;
 			}
-			if ( !$this->edit ) { 
+			if ( !isset( $this->edit ) ) { 
 				$this->edit = "Edit"; 
 			}
-			if ( !$this->edit_item ) { 
+			if ( !isset( $this->edit_item ) ) { 
 				$this->edit_item = "Edit " . $this->singular_name; 
 			}
-			if ( !$this->new_item ) { 
+			if ( !isset( $this->new_item ) ) { 
 				$this->new_item = "New " . $this->singular_name; 
 			}
-			if ( !$this->view ) { 
+			if ( !isset( $this->view ) ) { 
 				$this->view = "View " . $this->singular_name . " Page"; 
 			}
-			if ( !$this->view_item ) { 
+			if ( !isset( $this->view_item ) ) { 
 				$this->view_item = "View " . $this->singular_name; 
 			}
-			if ( !$this->search_items ) { 
+			if ( !isset( $this->search_items ) ) { 
 				$this->search_items = "Search " . $this->plural_name; 
 			}
-			if ( !$this->not_found ) {
+			if ( !isset( $this->not_found ) ) {
 				$this->not_found = "No matching " . strtolower( $this->plural_name ) . " found";
 			}
-			if ( !$this->not_found_in_trash ) {
+			if ( !isset( $this->not_found_in_trash ) ) {
 				$this->not_found_in_trash = "No " . strtolower( $this->plural_name ) . " found in Trash";
 			}
-			if ( !$this->parent_item_colon ) {
+			if ( !isset( $this->parent_item_colon ) ) {
 				$this->parent_item_colon = "Parent " . $this->singular_name;
 			}
 			
