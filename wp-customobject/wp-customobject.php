@@ -209,34 +209,44 @@ Author URI: http://jasonthings.com
 			 */
 			 
 			 /* http://minimalbugs.com/questions/how-to-disable-add-new-post-in-particular-custom-post-types-wordpress */
-			 
-			add_action( 'admin_menu', 'hide_add_new_custom_type', function () {
-				global $submenu;
-				unset($submenu['edit.php?post_type='. $this->type][10]);
-			});
-			add_action( 'admin_head', 'hide_buttons', function () {
-				global $pagenow;
-      	if ( is_admin() ) {
-        	if ( $pagenow == 'edit.php' && $_GET['post_type'] == $this->type ) {
-            echo "<style type=\"text/css\">.add-new-h2{display: none;}</style>";
-      		}  
-      	}
-			});
-			add_action( 'admin_menu', 'permissions_admin_redirect', function () {
-				$result = stripos( $_SERVER['REQUEST_URI'], 'post-new.php?post_type='. $this->type );
-				if ( $result !== false ) {
-					wp_redirect( get_option('siteurl') . '/wp-admin/index.php?permissions_error=true' );
-				}
-			});
-			add_action( 'admin_init', 'permissions_show_notice', function () {
-				if ( $_GET['permissions_error'] ) {
-				add_action( 'admin_notices', function () {
-					// use the class "error" for red notices, and "update" for yellow notices
-					echo "<div id='permissions-warning' class='error fade'><p><strong>".__('Adding new ' . $this->plural_name . ' is currently disabled.')."</strong></p></div>";
-				});  
-			});
+			
+			add_action( 'admin_menu', array( $this, 'disable_addnew_hide_submenu' ) );
+			add_action( 'admin_head', array( $this, 'disable_addnew_hide_button' ) );
+			add_action( 'admin_menu', array( $this, 'disable_addnew_permissions_redirect' ) );
+			add_action( 'admin_init', array( $this, 'disable_addnew_show_notice' ) );
 			
 		}
+				public function disable_addnew_hide_submenu() {
+					global $submenu;
+					unset($submenu['edit.php?post_type='. $this->type][10]);
+				}
+				
+				public function disable_addnew_hide_button() {
+					global $pagenow;
+					if ( is_admin() ) {
+				  	if ( $pagenow == 'edit.php' && $_GET['post_type'] == $this->type ) {
+				      echo "<style type=\"text/css\">.add-new-h2{display: none;}</style>";
+						}  
+					}
+				}
+				
+				public function disable_addnew_permissions_redirect() {
+					$result = stripos( $_SERVER['REQUEST_URI'], 'post-new.php?post_type='. $this->type );
+					if ( $result !== false ) {
+						wp_redirect( get_option('siteurl') . '/wp-admin/index.php?'. $this->type . '_addnew_disabled=true' );
+					}
+				}
+				
+				public function disable_addnew_show_notice() {
+					if ( $_GET[$this->type . '_addnew_disabled'] ) {
+						add_action( 'admin_notices', array( $this, 'disable_addnew_admin_notice' ) );
+					}
+				}
+				
+				public function disable_addnew_admin_notice() {
+					// use the class "error" for red notices, and "update" for yellow notices
+					echo "<div id='permissions-warning' class='error fade'><p><strong>".__('Adding new ' . $this->plural_name . ' is currently disabled.')."</strong></p></div>";
+				}
 
 	
 	} // end CustomObject class
