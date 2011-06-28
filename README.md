@@ -35,6 +35,22 @@ For example:
 		'menu_position' => 30, # controlling where the object's menus appear in the Admin Menu
 		'supports' => array( 'title', 'editor', 'thumbnail' ) # what appears on the new/edit page
 	);
->
+?>
 ```
 
+### Labels Array
+
+This is the labels argument, separated into it's own array for clarity. I almost always leave this as a blank array and let the class fill in default values. The defaults are just what you would expect for each scenario.
+
+_Note: The WordPress defaults here always use "post" everywhere, so these defaults incorporate your new object type's name._
+
+If you have special labels you'd like to assign, you can. Like this:
+
+```php
+<?php
+	$labels = array(
+		'new_item' => "New Totally Rad Amazing Object",
+		'not_found' => "We couldn't find any of these at all and boy did we look and look."
+	);
+?>
+```
