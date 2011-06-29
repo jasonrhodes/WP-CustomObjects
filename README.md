@@ -1,8 +1,10 @@
 # WP Custom Object Plugin
 
-First things first: I use "custom object" instead of "custom post type". Cause they're not posts.
+First things first: I call them "custom objects" instead of "custom post types". Cause, you know, they're _not posts_.
 
 This is a custom object class to help you build a basic custom object really fast. It's built for developers who are building CMS-type applications on the WordPress platform.
+
+PS _I've submitted to get this in the WordPress SVN repo, too. We'll see._
 
 ## How to Use This Plugin
 
