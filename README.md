@@ -131,6 +131,8 @@ For my own sake, I'll be adding the ability to add custom taxonomies to a new ob
 
 If you have _any_ suggestions, leave them in the [Issues](/jasonrhodes/WP-CustomObjects/issues/) section here on GitHub.
 
+**Oh, and hit me up on Twitter if you have any questions. [@rhodesjason](http://twitter.com/rhodesjason)**
+
 ## Summary
 
 If all of that isn't enough to get you started, there's also an ```example-functions.php``` file in the plugin folder that walks you through another example.
