@@ -138,3 +138,7 @@ If you have _any_ suggestions, leave them in the [Issues](/jasonrhodes/WP-Custom
 If all of that isn't enough to get you started, there's also an ```example-functions.php``` file in the plugin folder that walks you through another example.
 
 Have fun building custom objects and conquering the universe.
+
+
+_PS testing an image in Markdown..._
+![test image](http://blog.ajaxmasters.com/wp-content/uploads/2009/09/halo_wordpress.jpg)
