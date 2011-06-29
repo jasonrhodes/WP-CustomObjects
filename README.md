@@ -1,4 +1,4 @@
-# WP Custom Object Plugin
+# WP-CustomObjects For Developers (A WordPress Plugin)
 
 First things first: I call them "custom objects" instead of "custom post types". Cause, you know, they're _not posts_.
 
