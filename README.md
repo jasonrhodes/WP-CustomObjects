@@ -108,7 +108,7 @@ Short description appears under the title of the box.
 
 1. **fields** (array)
 Each item in this array is another array which includes:
-* name
-* label
-* type
-* options (if needed for something like a select box or radio group)
+> * name
+> * label
+> * type
+> * options (if needed for something like a select box or radio group)
