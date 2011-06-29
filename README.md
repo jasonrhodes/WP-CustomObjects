@@ -122,3 +122,9 @@ options: high | core | default | low
     * label
     * type
     * options (if needed for something like a select box or radio group)
+
+## Summary
+
+If all of that isn't enough to get you started, there's also an ```example-functions.php``` file in the plugin folder that walks you through another example.
+
+Have fun building custom objects and conquering the universe.
