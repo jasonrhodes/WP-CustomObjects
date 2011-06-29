@@ -85,30 +85,40 @@ To set up a generic metabox for your new object type, use the variable you set w
 Just like before, we pass this function an options array. Here are the available options:
 
 1. **ID** (string)
-The HTML id value to assign to this metabox div in the admin section
-Default: 'metabox-' . time()
+
+    The HTML id value to assign to this metabox div in the admin section
+    
+    Default: 'metabox-' . time()
 
 1. **title** (string)
-Title value across the top of the metabox
-Default: Custom Type . "Metabox"
+
+    Title value across the top of the metabox
+    
+    Default: Custom Type . "Metabox"
 
 1. **context** (string)
 options: normal | advanced | side
-Determines in which section of the page the box will appear
-> Normal = Right below the content.
-> Advanced = Further below the Normal section.
-> Side = in the narrower side section, somewhere under the "Publish/Update" box
+
+    Determines in which section of the page the box will appear
+
+    * Normal = Right below the content.
+    * Advanced = Further below the Normal section.
+    * Side = in the narrower side section, somewhere under the "Publish/Update" box
 
 1. **priority** (string)
 options: high | core | default | low
-Determines where in the section the box will appear
+
+    Determines where in the section the box will appear
 
 1. **description** (string)
-Short description appears under the title of the box.
+
+    Short description appears under the title of the box.
 
 1. **fields** (array)
-Each item in this array is another array which includes:
-> * name
-> * label
-> * type
-> * options (if needed for something like a select box or radio group)
+
+    Each item in this array is another array which includes:
+
+    * name
+    * label
+    * type
+    * options (if needed for something like a select box or radio group)
