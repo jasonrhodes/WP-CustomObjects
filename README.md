@@ -125,6 +125,12 @@ options: high | core | default | low
     * type
     * options (if needed for something like a select box or radio group)
 
+## Future plans
+
+For my own sake, I'll be adding the ability to add custom taxonomies to a new object type, and I want to include static versions of the metabox and taxonomy methods so I can use them to build stuff for posts and pages, too.
+
+If you have _any_ suggestions, leave them in the [Issues]("issues") section here on GitHub.
+
 ## Summary
 
 If all of that isn't enough to get you started, there's also an ```example-functions.php``` file in the plugin folder that walks you through another example.
